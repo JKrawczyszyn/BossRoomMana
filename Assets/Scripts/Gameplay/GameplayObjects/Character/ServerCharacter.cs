@@ -19,6 +19,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
     [RequireComponent(typeof(NetworkHealthState),
         typeof(NetworkLifeState),
         typeof(NetworkAvatarGuidState))]
+    [RequireComponent(typeof(NetworkManaState))]
     public class ServerCharacter : NetworkBehaviour, ITargetable
     {
         [FormerlySerializedAs("m_ClientVisualization")]
@@ -57,6 +58,8 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
 
         public NetworkHealthState NetHealthState { get; private set; }
 
+        public NetworkManaState NetManaState { get; private set; }
+
         /// <summary>
         /// The active target of this character.
         /// </summary>
@@ -69,6 +72,15 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
         {
             get => NetHealthState.Stat.Value;
             private set => NetHealthState.Stat.Value = value;
+        }
+
+        /// <summary>
+        /// Current Mana. This value is populated at startup time from CharacterClass data.
+        /// </summary>
+        public int ManaPoints
+        {
+            get => NetManaState.Stat.Value;
+            private set => NetManaState.Stat.Value = value;
         }
 
         public NetworkLifeState NetLifeState { get; private set; }
@@ -146,6 +158,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
             m_ServerActionPlayer = new ServerActionPlayer(this);
             NetLifeState = GetComponent<NetworkLifeState>();
             NetHealthState = GetComponent<NetworkHealthState>();
+            NetManaState = GetComponent<NetworkManaState>();
             m_State = GetComponent<NetworkAvatarGuidState>();
         }
 
@@ -168,7 +181,8 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
                     var startingAction = new ActionRequestData() { ActionID = m_StartingAction.ActionID };
                     PlayAction(ref startingAction);
                 }
-                InitializeHitPoints();
+
+                InitializeStatPoints();
             }
         }
 
@@ -237,9 +251,10 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
             m_ServerActionPlayer.OnGameplayActivity(Action.GameplayActivity.StoppedChargingUp);
         }
 
-        void InitializeHitPoints()
+        void InitializeStatPoints()
         {
             HitPoints = CharacterClass.BaseHP.Value;
+            ManaPoints = CharacterClass.BaseMana;
 
             if (!IsNpc)
             {
@@ -251,6 +266,8 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
                     {
                         LifeState = LifeState.Fainted;
                     }
+
+                    ManaPoints = sessionPlayerData.Value.CurrentManaPoints;
                 }
             }
         }
@@ -351,6 +368,11 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
                 m_ServerActionPlayer.ClearActions(false);
             }
         }
+
+        public void ReceiveMana(int mana)
+        {
+            ManaPoints = Mathf.Clamp(ManaPoints + mana, 0, CharacterClass.BaseMana);
+        } 
 
         /// <summary>
         /// Determines a gameplay variable for this character. The value is determined
