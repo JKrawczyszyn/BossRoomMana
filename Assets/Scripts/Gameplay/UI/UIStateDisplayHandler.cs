@@ -126,8 +126,8 @@ namespace Unity.BossRoom.Gameplay.UI
 
                 if (m_DisplayHealth)
                 {
-                    m_NetworkHealthState.HitPointsReplenished += DisplayUIHealth;
-                    m_NetworkHealthState.HitPointsDepleted += RemoveUIHealth;
+                    m_NetworkHealthState.StatReplenished += DisplayUIHealth;
+                    m_NetworkHealthState.StatDepleted += RemoveUIHealth;
                 }
             }
 
@@ -151,8 +151,8 @@ namespace Unity.BossRoom.Gameplay.UI
 
             if (m_NetworkHealthState != null)
             {
-                m_NetworkHealthState.HitPointsReplenished -= DisplayUIHealth;
-                m_NetworkHealthState.HitPointsDepleted -= RemoveUIHealth;
+                m_NetworkHealthState.StatReplenished -= DisplayUIHealth;
+                m_NetworkHealthState.StatDepleted -= RemoveUIHealth;
             }
 
             if (m_ClientAvatarGuidHandler)
@@ -189,7 +189,7 @@ namespace Unity.BossRoom.Gameplay.UI
                 SpawnUIState();
             }
 
-            m_UIState.DisplayHealth(m_NetworkHealthState.HitPoints, m_BaseHP.Value);
+            m_UIState.DisplayHealth(m_NetworkHealthState.Stat, m_BaseHP.Value);
             m_UIStateActive = true;
         }
 

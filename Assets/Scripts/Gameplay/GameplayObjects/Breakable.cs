@@ -62,7 +62,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects
             {
                 if (m_MaxHealth && m_NetworkHealthState)
                 {
-                    m_NetworkHealthState.HitPoints.Value = m_MaxHealth.Value;
+                    m_NetworkHealthState.Stat.Value = m_MaxHealth.Value;
                 }
             }
 
@@ -101,9 +101,9 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects
 
                 if (m_NetworkHealthState)
                 {
-                    m_NetworkHealthState.HitPoints.Value =
-                        Mathf.Clamp(m_NetworkHealthState.HitPoints.Value + HP, 0, m_MaxHealth.Value);
-                    if (m_NetworkHealthState.HitPoints.Value <= 0)
+                    m_NetworkHealthState.Stat.Value =
+                        Mathf.Clamp(m_NetworkHealthState.Stat.Value + HP, 0, m_MaxHealth.Value);
+                    if (m_NetworkHealthState.Stat.Value <= 0)
                     {
                         Break();
                     }
@@ -129,7 +129,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects
             if (m_Collider)
                 m_Collider.enabled = true;
             if (m_MaxHealth && m_NetworkHealthState)
-                m_NetworkHealthState.HitPoints.Value = m_MaxHealth.Value;
+                m_NetworkHealthState.Stat.Value = m_MaxHealth.Value;
         }
 
         public IDamageable.SpecialDamageFlags GetSpecialDamageFlags()
@@ -205,4 +205,3 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects
 
 
 }
-

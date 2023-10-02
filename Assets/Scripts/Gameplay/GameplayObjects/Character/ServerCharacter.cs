@@ -67,8 +67,8 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
         /// </summary>
         public int HitPoints
         {
-            get => NetHealthState.HitPoints.Value;
-            private set => NetHealthState.HitPoints.Value = value;
+            get => NetHealthState.Stat.Value;
+            private set => NetHealthState.Stat.Value = value;
         }
 
         public NetworkLifeState NetLifeState { get; private set; }

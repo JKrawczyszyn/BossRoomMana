@@ -106,7 +106,7 @@ namespace Unity.BossRoom.Gameplay.UI
 
             SetUIFromSlotData(0, m_OwnedServerCharacter);
 
-            m_OwnedServerCharacter.NetHealthState.HitPoints.OnValueChanged += SetHeroHealth;
+            m_OwnedServerCharacter.NetHealthState.Stat.OnValueChanged += SetHeroHealth;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             m_OwnedServerCharacter.NetLifeState.IsGodMode.OnValueChanged += SetHeroGodModeStatus;
@@ -158,7 +158,7 @@ namespace Unity.BossRoom.Gameplay.UI
 
             SetUIFromSlotData(slot, serverCharacter);
 
-            serverCharacter.NetHealthState.HitPoints.OnValueChanged += (int previousValue, int newValue) =>
+            serverCharacter.NetHealthState.Stat.OnValueChanged += (int previousValue, int newValue) =>
             {
                 SetAllyHealth(id, newValue);
             };
@@ -300,7 +300,7 @@ namespace Unity.BossRoom.Gameplay.UI
         {
             if (m_OwnedServerCharacter && m_OwnedServerCharacter.NetHealthState)
             {
-                m_OwnedServerCharacter.NetHealthState.HitPoints.OnValueChanged -= SetHeroHealth;
+                m_OwnedServerCharacter.NetHealthState.Stat.OnValueChanged -= SetHeroHealth;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 m_OwnedServerCharacter.NetLifeState.IsGodMode.OnValueChanged -= SetHeroGodModeStatus;
 #endif
@@ -329,7 +329,7 @@ namespace Unity.BossRoom.Gameplay.UI
 
             if (m_TrackedAllies.TryGetValue(id, out ServerCharacter serverCharacter))
             {
-                serverCharacter.NetHealthState.HitPoints.OnValueChanged -= (int previousValue, int newValue) =>
+                serverCharacter.NetHealthState.Stat.OnValueChanged -= (int previousValue, int newValue) =>
                 {
                     SetAllyHealth(id, newValue);
                 };
