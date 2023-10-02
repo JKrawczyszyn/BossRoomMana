@@ -14,8 +14,11 @@ namespace Unity.BossRoom.Gameplay.UI
         UIName m_UIName;
 
         [SerializeField]
-        UIHealth m_UIHealth;
+        UIBar m_UIHealth;
 
+        [SerializeField]
+        UIBar m_UIMana;
+        
         public void DisplayName(NetworkVariable<FixedPlayerName> networkedName)
         {
             m_UIName.gameObject.SetActive(true);
@@ -28,9 +31,20 @@ namespace Unity.BossRoom.Gameplay.UI
             m_UIHealth.Initialize(networkedHealth, maxValue);
         }
 
+        public void DisplayMana(NetworkVariable<int> networkedMana, int maxValue)
+        {
+            m_UIMana.gameObject.SetActive(true);
+            m_UIMana.Initialize(networkedMana, maxValue);
+        }
+
         public void HideHealth()
         {
             m_UIHealth.gameObject.SetActive(false);
+        }
+
+        public void HideMana()
+        {
+            m_UIMana.gameObject.SetActive(false);
         }
     }
 }

@@ -24,6 +24,9 @@ namespace Unity.BossRoom.Gameplay.UI
         bool m_DisplayHealth;
 
         [SerializeField]
+        bool m_DisplayMana;
+
+        [SerializeField]
         bool m_DisplayName;
 
         [SerializeField]
@@ -38,6 +41,9 @@ namespace Unity.BossRoom.Gameplay.UI
 
         [SerializeField]
         NetworkHealthState m_NetworkHealthState;
+        
+        [SerializeField]
+        NetworkManaState m_NetworkManaState;
 
         [SerializeField]
         NetworkNameState m_NetworkNameState;
@@ -50,6 +56,9 @@ namespace Unity.BossRoom.Gameplay.UI
 
         [SerializeField]
         IntVariable m_BaseHP;
+        
+        [SerializeField]
+        int m_BaseMana;
 
         [Tooltip("UI object(s) will appear positioned at this transforms position.")]
         [SerializeField]
@@ -102,10 +111,14 @@ namespace Unity.BossRoom.Gameplay.UI
             }
             Assert.IsNotNull(m_CanvasTransform);
 
-            Assert.IsTrue(m_DisplayHealth || m_DisplayName, "Neither display fields are toggled on!");
+            Assert.IsTrue(m_DisplayHealth || m_DisplayMana || m_DisplayName, "Neither display fields are toggled on!");
             if (m_DisplayHealth)
             {
                 Assert.IsNotNull(m_NetworkHealthState, "A NetworkHealthState component needs to be attached!");
+            }
+            if (m_DisplayMana)
+            {
+                Assert.IsNotNull(m_NetworkManaState, "A NetworkManaState component needs to be attached!");
             }
 
             m_VerticalOffset = new Vector3(0f, m_VerticalScreenOffset, 0f);
@@ -114,6 +127,7 @@ namespace Unity.BossRoom.Gameplay.UI
             if (TryGetComponent(out m_ClientAvatarGuidHandler) && TryGetComponent(out m_NetworkAvatarGuidState))
             {
                 m_BaseHP = m_NetworkAvatarGuidState.RegisteredAvatar.CharacterClass.BaseHP;
+                m_BaseMana = m_NetworkAvatarGuidState.RegisteredAvatar.CharacterClass.BaseMana;
 
                 if (m_ServerCharacter.clientCharacter)
                 {
@@ -128,6 +142,12 @@ namespace Unity.BossRoom.Gameplay.UI
                 {
                     m_NetworkHealthState.StatReplenished += DisplayUIHealth;
                     m_NetworkHealthState.StatDepleted += RemoveUIHealth;
+                }
+                
+                if (m_DisplayMana)
+                {
+                    m_NetworkManaState.StatReplenished += DisplayUIMana;
+                    m_NetworkManaState.StatDepleted += RemoveUIMana;
                 }
             }
 
@@ -153,6 +173,12 @@ namespace Unity.BossRoom.Gameplay.UI
             {
                 m_NetworkHealthState.StatReplenished -= DisplayUIHealth;
                 m_NetworkHealthState.StatDepleted -= RemoveUIHealth;
+            }
+            
+            if (m_NetworkManaState != null)
+            {
+                m_NetworkManaState.StatReplenished -= DisplayUIMana;
+                m_NetworkManaState.StatDepleted -= RemoveUIMana;
             }
 
             if (m_ClientAvatarGuidHandler)
@@ -192,6 +218,23 @@ namespace Unity.BossRoom.Gameplay.UI
             m_UIState.DisplayHealth(m_NetworkHealthState.Stat, m_BaseHP.Value);
             m_UIStateActive = true;
         }
+        
+        void DisplayUIMana()
+        {
+            if (m_NetworkManaState == null)
+            {
+                return;
+            }
+
+            if (m_UIState == null)
+            {
+                SpawnUIState();
+            }
+
+            m_UIState.DisplayMana(m_NetworkManaState.Stat, m_BaseMana);
+            m_UIStateActive = true;
+        }
+
 
         void SpawnUIState()
         {
@@ -205,6 +248,11 @@ namespace Unity.BossRoom.Gameplay.UI
         {
             StartCoroutine(WaitToHideHealthBar());
         }
+        
+        void RemoveUIMana()
+        {
+            StartCoroutine(WaitToHideManaBar());
+        }
 
         IEnumerator WaitToHideHealthBar()
         {
@@ -213,6 +261,13 @@ namespace Unity.BossRoom.Gameplay.UI
             m_UIState.HideHealth();
         }
 
+        IEnumerator WaitToHideManaBar()
+        {
+            yield return new WaitForSeconds(k_DurationSeconds);
+
+            m_UIState.HideMana();
+        }
+        
         void TrackGraphicsTransform(GameObject graphicsGameObject)
         {
             m_TransformToTrack = graphicsGameObject.transform;
