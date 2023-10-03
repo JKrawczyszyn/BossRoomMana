@@ -61,17 +61,7 @@ namespace Unity.BossRoom.Gameplay.Actions
 
             var myBounds = attacker.bounds;
 
-            if (s_PCLayer == -1)
-                s_PCLayer = LayerMask.NameToLayer("PCs");
-            if (s_NpcLayer == -1)
-                s_NpcLayer = LayerMask.NameToLayer("NPCs");
-
-            int mask = 0;
-            if (wantPcs)
-                mask |= (1 << s_PCLayer);
-            if (wantNpcs)
-                mask |= (1 << s_NpcLayer);
-
+            int mask = GetMask(wantPcs, wantNpcs);
             int numResults = Physics.BoxCastNonAlloc(attacker.transform.position, myBounds.extents,
                 attacker.transform.forward, s_Hits, Quaternion.identity, range, mask);
 
@@ -211,7 +201,39 @@ namespace Unity.BossRoom.Gameplay.Actions
             return destinationSpot;
         }
 
+        /// <summary>
+        /// Returns colliders in sphere.
+        /// </summary>
+        /// <param name="wantPcs">true if we should detect PCs</param>
+        /// <param name="wantNpcs">true if we should detect NPCs</param>
+        /// <param name="position">The center of the sphere</param>
+        /// <param name="radius">The radius of the sphere</param>
+        public static Collider[] GetCollidersInSphere(bool wantPcs, bool wantNpcs, Vector3 position, float radius)
+        {
+            int layerMask = GetMask(wantPcs, wantNpcs);
+            
+            // Note: could have a non alloc version of this overlap sphere where we statically store our collider array, but since this is a self
+            // destroyed object, the complexity added to have a static pool of colliders that could be called by multiplayer players at the same time
+            // doesn't seem worth it for now.
+            return Physics.OverlapSphere(position, radius, layerMask);
+        }
 
+        private static int GetMask(bool wantPcs, bool wantNpcs)
+        {
+            if (s_PCLayer == -1)
+                s_PCLayer = LayerMask.NameToLayer("PCs");
+            if (s_NpcLayer == -1)
+                s_NpcLayer = LayerMask.NameToLayer("NPCs");
+            
+            var mask = 0;
+
+            if (wantPcs)
+                mask |= (1 << s_PCLayer);
+            if (wantNpcs)
+                mask |= (1 << s_NpcLayer);
+
+            return mask;
+        }
     }
 
     /// <summary>

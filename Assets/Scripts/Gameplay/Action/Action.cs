@@ -112,7 +112,7 @@ namespace Unity.BossRoom.Gameplay.Actions
         /// <returns>true to become a non-blocking Action, false to remain a blocking Action</returns>
         public virtual bool ShouldBecomeNonBlocking()
         {
-            return Config.BlockingMode == BlockingModeType.OnlyDuringExecTime ? TimeRunning >= Config.ExecTimeSeconds : false;
+            return Config.BlockingMode == BlockingModeType.OnlyDuringExecTime && TimeRunning >= Config.ExecTimeSeconds;
         }
 
         /// <summary>

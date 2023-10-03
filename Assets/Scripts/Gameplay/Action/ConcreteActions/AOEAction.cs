@@ -59,13 +59,10 @@ namespace Unity.BossRoom.Gameplay.Actions
 
         private void PerformAoE(ServerCharacter parent)
         {
-            // Note: could have a non alloc version of this overlap sphere where we statically store our collider array, but since this is a self
-            // destroyed object, the complexity added to have a static pool of colliders that could be called by multiplayer players at the same time
-            // doesn't seem worth it for now.
-            var colliders = Physics.OverlapSphere(m_Data.Position, Config.Radius, LayerMask.GetMask("NPCs"));
-            for (var i = 0; i < colliders.Length; i++)
+            var colliders = ActionUtils.GetCollidersInSphere(false, true, m_Data.Position, Config.Radius);
+            foreach (Collider collider in colliders)
             {
-                var enemy = colliders[i].GetComponent<IDamageable>();
+                var enemy = collider.GetComponent<IDamageable>();
                 if (enemy != null)
                 {
                     // actually deal the damage
