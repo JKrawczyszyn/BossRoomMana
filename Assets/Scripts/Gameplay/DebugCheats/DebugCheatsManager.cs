@@ -1,5 +1,6 @@
 using System;
 using Unity.BossRoom.ConnectionManagement;
+using Unity.BossRoom.Gameplay.Actions;
 using Unity.BossRoom.Gameplay.GameplayObjects;
 using Unity.BossRoom.Gameplay.GameplayObjects.Character;
 using Unity.BossRoom.Gameplay.Messages;
@@ -159,7 +160,7 @@ namespace Unity.BossRoom.DebugCheats
                     var damageable = obj.GetComponent<IDamageable>();
                     if (damageable != null && damageable.IsDamageable())
                     {
-                        damageable.ReceiveHP(playerServerCharacter, int.MinValue);
+                        damageable.ReceiveStat(playerServerCharacter, int.MinValue, StatType.Health);
                         PublishCheatUsedMessage(serverRpcParams.Receive.SenderClientId, "KillTarget");
                     }
                     else
@@ -180,7 +181,7 @@ namespace Unity.BossRoom.DebugCheats
                 {
                     if (serverCharacter.gameObject.TryGetComponent(out IDamageable damageable))
                     {
-                        damageable.ReceiveHP(null, -serverCharacter.HitPoints);
+                        damageable.ReceiveStat(null, -serverCharacter.HitPoints, StatType.Health);
                     }
                 }
             }
@@ -215,7 +216,7 @@ namespace Unity.BossRoom.DebugCheats
                 {
                     if (playerServerCharacter.gameObject.TryGetComponent(out IDamageable damageable))
                     {
-                        damageable.ReceiveHP(null, baseHp);
+                        damageable.ReceiveStat(null, baseHp, StatType.Health);
                     }
                 }
                 PublishCheatUsedMessage(serverRpcParams.Receive.SenderClientId, "HealPlayer");

@@ -1,4 +1,5 @@
 using System;
+using Unity.BossRoom.Gameplay.Actions;
 using Unity.BossRoom.Gameplay.GameplayObjects.Character;
 using Unity.BossRoom.Infrastructure;
 using Unity.Netcode;
@@ -85,7 +86,17 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects
             }
         }
 
-        public void ReceiveHP(ServerCharacter inflicter, int HP)
+        public void ReceiveStat(ServerCharacter inflicter, int value, StatType type)
+        {
+            switch (type)
+            {
+                case StatType.Health:
+                    ReceiveHP(inflicter, value);
+                    break;
+            }
+        }
+
+        private void ReceiveHP(ServerCharacter inflicter, int HP)
         {
             if (HP < 0)
             {

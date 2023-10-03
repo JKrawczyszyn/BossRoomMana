@@ -1,4 +1,5 @@
 using System;
+using Unity.BossRoom.Gameplay.Actions;
 using Unity.BossRoom.Gameplay.GameplayObjects.Character;
 using Unity.Netcode;
 using UnityEngine;
@@ -102,7 +103,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects
             {
                 if (m_CollisionCache[i].gameObject.TryGetComponent(out IDamageable damageReceiver))
                 {
-                    damageReceiver.ReceiveHP(null, -m_DamagePoints);
+                    damageReceiver.ReceiveStat(null, -m_DamagePoints, StatType.Health);
 
                     var serverCharacter = m_CollisionCache[i].gameObject.GetComponentInParent<ServerCharacter>();
                     if (serverCharacter)

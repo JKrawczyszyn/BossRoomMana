@@ -13,6 +13,9 @@ namespace Unity.BossRoom.Gameplay.Actions
         [Tooltip("Could be damage, could be healing, or other things. This is a base, nominal value that will get modified by game logic when the action takes effect")]
         public int Amount;
 
+        [Tooltip("What stat this Action affects (e.g. Health, Mana, etc.)")]
+        public StatType StatType;
+
         [Tooltip("How much it costs in Mana to play this Action")]
         public int ManaCost;
 

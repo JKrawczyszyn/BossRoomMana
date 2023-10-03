@@ -172,7 +172,7 @@ namespace Unity.BossRoom.Gameplay.Actions
 
                 if (victim.gameObject.TryGetComponent(out IDamageable damageable))
                 {
-                    damageable.ReceiveHP(parent, -damage);
+                    damageable.ReceiveStat(parent, -damage, Config.StatType);
                 }
             }
 
@@ -209,7 +209,7 @@ namespace Unity.BossRoom.Gameplay.Actions
                 var damageable = collider.gameObject.GetComponent<IDamageable>();
                 if (damageable != null)
                 {
-                    damageable.ReceiveHP(parent, -Config.SplashDamage);
+                    damageable.ReceiveStat(parent, -Config.SplashDamage, Config.StatType);
 
                     // lastly, a special case: if the trampler runs into certain breakables, they are stunned!
                     if ((damageable.GetSpecialDamageFlags() & IDamageable.SpecialDamageFlags.StunOnTrample) == IDamageable.SpecialDamageFlags.StunOnTrample)
