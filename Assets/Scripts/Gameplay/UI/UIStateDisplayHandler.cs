@@ -127,7 +127,7 @@ namespace Unity.BossRoom.Gameplay.UI
             if (TryGetComponent(out m_ClientAvatarGuidHandler) && TryGetComponent(out m_NetworkAvatarGuidState))
             {
                 m_BaseHP = m_NetworkAvatarGuidState.RegisteredAvatar.CharacterClass.BaseHP;
-                m_BaseMana = m_NetworkAvatarGuidState.RegisteredAvatar.CharacterClass.BaseMana;
+                m_BaseMana = 0;
 
                 if (m_ServerCharacter.clientCharacter)
                 {

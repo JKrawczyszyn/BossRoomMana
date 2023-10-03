@@ -254,7 +254,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
         void InitializeStatPoints()
         {
             HitPoints = CharacterClass.BaseHP.Value;
-            ManaPoints = CharacterClass.BaseMana;
+            ManaPoints = 0;
 
             if (!IsNpc)
             {
