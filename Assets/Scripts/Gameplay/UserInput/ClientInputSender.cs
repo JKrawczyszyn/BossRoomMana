@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.BossRoom.Gameplay.Actions;
 using Unity.BossRoom.Gameplay.Configuration;
 using Unity.BossRoom.Gameplay.GameplayObjects;
@@ -92,7 +93,7 @@ namespace Unity.BossRoom.Gameplay.UserInput
         /// </summary>
         int m_ActionRequestCount;
 
-        BaseActionInput m_CurrentSkillInput;
+        readonly Dictionary<int, BaseActionInput> m_CurrentSkillInputs = new Dictionary<int, BaseActionInput>();
 
         bool m_MoveRequest;
 
@@ -199,9 +200,9 @@ namespace Unity.BossRoom.Gameplay.UserInput
             UpdateAction1();
         }
 
-        void FinishSkill()
+        void FinishSkill(int blockingGroup)
         {
-            m_CurrentSkillInput = null;
+            m_CurrentSkillInputs.Remove(blockingGroup);
         }
 
         void SendInput(ActionRequestData action)
@@ -215,22 +216,26 @@ namespace Unity.BossRoom.Gameplay.UserInput
             //play all ActionRequests, in FIFO order.
             for (int i = 0; i < m_ActionRequestCount; ++i)
             {
-                if (m_CurrentSkillInput != null)
+                var actionPrototype = GameDataSource.Instance.GetActionPrototypeByID(m_ActionRequests[i].RequestedActionID);
+                var config = actionPrototype.Config;
+
+                m_CurrentSkillInputs.TryGetValue(config.BlockingGroup, out var skillInput);
+
+                if (skillInput != null)
                 {
                     //actions requested while input is active are discarded, except for "Release" requests, which go through.
                     if (IsReleaseStyle(m_ActionRequests[i].TriggerStyle))
                     {
-                        m_CurrentSkillInput.OnReleaseKey();
+                        skillInput.OnReleaseKey();
                     }
                 }
                 else if (!IsReleaseStyle(m_ActionRequests[i].TriggerStyle))
                 {
-                    var actionPrototype = GameDataSource.Instance.GetActionPrototypeByID(m_ActionRequests[i].RequestedActionID);
-                    if (actionPrototype.Config.ActionInput != null)
+                    if (config.ActionInput != null)
                     {
-                        var skillPlayer = Instantiate(actionPrototype.Config.ActionInput);
-                        skillPlayer.Initiate(m_ServerCharacter, m_PhysicsWrapper.Transform.position, actionPrototype.ActionID, SendInput, FinishSkill);
-                        m_CurrentSkillInput = skillPlayer;
+                        var skillPlayer = Instantiate(config.ActionInput);
+                        skillPlayer.Initiate(m_ServerCharacter, m_PhysicsWrapper.Transform.position, actionPrototype.ActionID, config.BlockingGroup, SendInput, FinishSkill);
+                        m_CurrentSkillInputs[config.BlockingGroup] = skillPlayer;
                     }
                     else
                     {
@@ -457,10 +462,18 @@ namespace Unity.BossRoom.Gameplay.UserInput
         /// <param name="actionID"> The action you'd like to perform. </param>
         /// <param name="triggerStyle"> What input style triggered this action. </param>
         /// <param name="targetId"> NetworkObjectId of target. </param>
-        public void RequestAction(ActionID actionID, SkillTriggerStyle triggerStyle, ulong targetId = 0)
+        /// <param name="checkCurrent"> If true, we will check if we already have an input for this blocking group. If so, we won't queue up another one. </param>
+        public void RequestAction(ActionID actionID, SkillTriggerStyle triggerStyle, ulong targetId = 0, bool checkCurrent = false)
         {
-            Assert.IsNotNull(GameDataSource.Instance.GetActionPrototypeByID(actionID),
+            var actionPrototype = GameDataSource.Instance.GetActionPrototypeByID(actionID);
+            Assert.IsNotNull(actionPrototype,
                 $"Action with actionID {actionID} must be contained in the Action prototypes of GameDataSource!");
+
+            if (checkCurrent && m_CurrentSkillInputs.TryGetValue(actionPrototype.Config.BlockingGroup, out var currentInput) && currentInput != null)
+            {
+                //If we already have an input for this blocking group, we don't want to queue up another one.
+                return;
+            }
 
             if (m_ActionRequestCount < m_ActionRequests.Length)
             {
@@ -515,19 +528,19 @@ namespace Unity.BossRoom.Gameplay.UserInput
                 RequestAction(GameDataSource.Instance.Emote4ActionPrototype.ActionID, SkillTriggerStyle.Keyboard);
             }
 
-            if (!EventSystem.current.IsPointerOverGameObject() && m_CurrentSkillInput == null)
+            if (!EventSystem.current.IsPointerOverGameObject())
             {
                 //IsPointerOverGameObject() is a simple way to determine if the mouse is over a UI element. If it is, we don't perform mouse input logic,
                 //to model the button "blocking" mouse clicks from falling through and interacting with the world.
 
                 if (Input.GetMouseButtonDown(1))
                 {
-                    RequestAction(CharacterClass.Skill1.ActionID, SkillTriggerStyle.MouseClick);
+                    RequestAction(CharacterClass.Skill1.ActionID, SkillTriggerStyle.MouseClick, 0, true);
                 }
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    RequestAction(GameDataSource.Instance.GeneralTargetActionPrototype.ActionID, SkillTriggerStyle.MouseClick);
+                    RequestAction(GameDataSource.Instance.GeneralTargetActionPrototype.ActionID, SkillTriggerStyle.MouseClick, 0, true);
                 }
                 else if (Input.GetMouseButton(0))
                 {

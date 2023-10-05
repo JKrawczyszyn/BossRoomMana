@@ -76,6 +76,9 @@ namespace Unity.BossRoom.Gameplay.Actions
         [Tooltip("Indicates how long this action blocks other actions from happening: during the execution stage, or for as long as it runs?")]
         public BlockingModeType BlockingMode;
 
+        [Tooltip("Action blocks other actions with same group.")]
+        public int BlockingGroup;
+
         [Tooltip("If this Action spawns a projectile, describes it. (\"Charged\" projectiles can list multiple possible shots, ordered from weakest to strongest)")]
         public ProjectileInfo[] Projectiles;
 
