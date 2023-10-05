@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.BossRoom.Gameplay.Actions;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -140,7 +141,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects
                 {
                     var serverComponent = state.GetComponent<Breakable>();
                     Assert.IsNotNull(serverComponent);
-                    serverComponent.ReceiveHP(null, Int32.MinValue);
+                    serverComponent.ReceiveStat(null, Int32.MinValue, StatType.Health);
                 }
             }
         }

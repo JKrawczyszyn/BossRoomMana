@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.BossRoom.Gameplay.GameplayObjects;
 using Unity.BossRoom.Gameplay.GameplayObjects.Character;
@@ -163,6 +164,25 @@ namespace Unity.BossRoom.Gameplay.Actions
             get
             {
                 return m_NonBlockingActions.Count + (m_Queue.Count > 0 ? 1 : 0);
+            }
+        }
+
+        /// <summary>
+        /// Returns all actions that are actively running. This includes all non-blocking actions,
+        /// </summary>
+        public IEnumerable<Action> RunningActions
+        {
+            get
+            {
+                foreach (var action in m_NonBlockingActions)
+                {
+                    yield return action;
+                }
+
+                if (m_Queue.Count > 0)
+                {
+                    yield return m_Queue[0];
+                }
             }
         }
 

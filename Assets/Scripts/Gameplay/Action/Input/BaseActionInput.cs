@@ -9,21 +9,23 @@ namespace Unity.BossRoom.Gameplay.Actions
         protected ServerCharacter m_PlayerOwner;
         protected Vector3 m_Origin;
         protected ActionID m_ActionPrototypeID;
+        int m_BlockingGroup;
         protected Action<ActionRequestData> m_SendInput;
-        System.Action m_OnFinished;
+        Action<int> m_OnFinished;
 
-        public void Initiate(ServerCharacter playerOwner, Vector3 origin, ActionID actionPrototypeID, Action<ActionRequestData> onSendInput, System.Action onFinished)
+        public void Initiate(ServerCharacter playerOwner, Vector3 origin, ActionID actionPrototypeID, int blockingGroup, Action<ActionRequestData> onSendInput, System.Action<int> onFinished)
         {
             m_PlayerOwner = playerOwner;
             m_Origin = origin;
             m_ActionPrototypeID = actionPrototypeID;
+            m_BlockingGroup = blockingGroup;
             m_SendInput = onSendInput;
             m_OnFinished = onFinished;
         }
 
         public void OnDestroy()
         {
-            m_OnFinished();
+            m_OnFinished(m_BlockingGroup);
         }
 
         public virtual void OnReleaseKey() { }

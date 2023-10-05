@@ -13,6 +13,9 @@ namespace Unity.BossRoom.Gameplay.Actions
         [Tooltip("Could be damage, could be healing, or other things. This is a base, nominal value that will get modified by game logic when the action takes effect")]
         public int Amount;
 
+        [Tooltip("What stat this Action affects (e.g. Health, Mana, etc.)")]
+        public StatType StatType;
+
         [Tooltip("How much it costs in Mana to play this Action")]
         public int ManaCost;
 
@@ -72,6 +75,9 @@ namespace Unity.BossRoom.Gameplay.Actions
 
         [Tooltip("Indicates how long this action blocks other actions from happening: during the execution stage, or for as long as it runs?")]
         public BlockingModeType BlockingMode;
+
+        [Tooltip("Action blocks other actions with same group.")]
+        public int BlockingGroup;
 
         [Tooltip("If this Action spawns a projectile, describes it. (\"Charged\" projectiles can list multiple possible shots, ordered from weakest to strongest)")]
         public ProjectileInfo[] Projectiles;

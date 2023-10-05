@@ -14,6 +14,8 @@ namespace Unity.BossRoom.Gameplay.Actions
         public float Range;
         [Tooltip("Damage of the Projectile on hit")]
         public int Damage;
+        [Tooltip("Stat that is used to determine the damage of the Projectile")]
+        public StatType StatType;
         [Tooltip("Max number of enemies this projectile can hit before disappearing")]
         public int MaxVictims;
     }

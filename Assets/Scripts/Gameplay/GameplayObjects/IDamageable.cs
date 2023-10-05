@@ -1,4 +1,5 @@
 using System;
+using Unity.BossRoom.Gameplay.Actions;
 using Unity.BossRoom.Gameplay.GameplayObjects.Character;
 using UnityEngine;
 
@@ -11,11 +12,12 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects
     public interface IDamageable
     {
         /// <summary>
-        /// Receives HP damage or healing.
+        /// Receives stat damage or healing.
         /// </summary>
         /// <param name="inflicter">The Character responsible for the damage. May be null.</param>
-        /// <param name="HP">The damage done. Negative value is damage, positive is healing.</param>
-        void ReceiveHP(ServerCharacter inflicter, int HP);
+        /// <param name="value">The damage done. Negative value is damage, positive is healing.</param>
+        /// <param name="type">The type of damage being done.</param>
+        void ReceiveStat(ServerCharacter inflicter, int value, StatType type);
 
         /// <summary>
         /// The NetworkId of this object.

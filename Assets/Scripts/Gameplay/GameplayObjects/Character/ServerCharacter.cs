@@ -168,7 +168,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
             else
             {
                 NetLifeState.LifeState.OnValueChanged += OnLifeStateChanged;
-                m_DamageReceiver.DamageReceived += ReceiveHP;
+                m_DamageReceiver.DamageReceived += ReceiveDamage;
                 m_DamageReceiver.CollisionEntered += CollisionEntered;
 
                 if (IsNpc)
@@ -192,7 +192,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
 
             if (m_DamageReceiver)
             {
-                m_DamageReceiver.DamageReceived -= ReceiveHP;
+                m_DamageReceiver.DamageReceived -= ReceiveDamage;
                 m_DamageReceiver.CollisionEntered -= CollisionEntered;
             }
         }
@@ -254,7 +254,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
         void InitializeStatPoints()
         {
             HitPoints = CharacterClass.BaseHP.Value;
-            ManaPoints = CharacterClass.BaseMana;
+            ManaPoints = 0;
 
             if (!IsNpc)
             {
@@ -309,11 +309,25 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
         }
 
         /// <summary>
-        /// Receive an HP change from somewhere. Could be healing or damage.
+        /// Receive an stat change from somewhere. Could be healing or damage, mana burn or mana gain.
         /// </summary>
-        /// <param name="inflicter">Person dishing out this damage/healing. Can be null. </param>
-        /// <param name="HP">The HP to receive. Positive value is healing. Negative is damage.  </param>
-        void ReceiveHP(ServerCharacter inflicter, int HP)
+        /// <param name="inflicter">Person dishing out this stat change. Can be null. </param>
+        /// <param name="value">The value to receive. Positive is healing. Negative is damage.  </param>
+        /// <param name="type">The type of stat - health/mana. </param>
+        void ReceiveDamage(ServerCharacter inflicter, int value, StatType type)
+        {
+            switch (type)
+            {
+                case StatType.Health:
+                    ReceiveHP(inflicter, value);
+                    break;
+                case StatType.Mana:
+                    ReceiveMana(value);
+                    break;
+            }
+        }
+
+        private void ReceiveHP(ServerCharacter inflicter, int HP)
         {
             //to our own effects, and modify the damage or healing as appropriate. But in this game, we just take it straight.
             if (HP > 0)
@@ -369,7 +383,7 @@ namespace Unity.BossRoom.Gameplay.GameplayObjects.Character
             }
         }
 
-        public void ReceiveMana(int mana)
+        private void ReceiveMana(int mana)
         {
             ManaPoints = Mathf.Clamp(ManaPoints + mana, 0, CharacterClass.BaseMana);
         } 
