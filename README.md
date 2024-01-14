@@ -1,4 +1,4 @@
-# Task_BossRoom
+# Boss Room mana
 
 Implementing mana aura skill in existing project forked from [Unity-Technologies/com.unity.multiplayer.samples.coop](https://github.com/Unity-Technologies/com.unity.multiplayer.samples.coop).
 
